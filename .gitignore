@@ -1,3 +1,22 @@
-# Python build artifacts
+# Android
+*.apk
+*.aab
+*.ap_
+*.apks
+*.dex
+*.class
+/build/
+/app/build/
+/capture.png
+.gradle/
+.idea/
+local.properties
+/captures/
+.cxx/
+*.iml
+.DS_Store
+*.hprof
+
+# Python
 __pycache__/
 *.pyc
