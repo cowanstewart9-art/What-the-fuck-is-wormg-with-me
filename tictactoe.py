@@ -75,7 +75,8 @@ def main():
         game.print_board()
         if player == 'X':
             try:
-                move = int(input('Enter your move (0-8): '))
+                user_input = input('Enter your move (0-8): ')
+                move = int(user_input)
                 if 0 <= move <= 8 and game.make_move(move, player):
                     if game.is_winner(player):
                         game.print_board()
@@ -90,6 +91,9 @@ def main():
                     print('Invalid move. Try again.')
             except ValueError:
                 print('Invalid input. Please enter a number.')
+            except (KeyboardInterrupt, EOFError):
+                print('\nGame exited by user.')
+                break
         else:
             game.ai_move()
             if game.is_winner('O'):

@@ -34,22 +34,25 @@ def count_to_ten_inefficiently():
     return numbers
 
 if __name__ == '__main__':
-    print("Running some pointless code...")
-    print("-" * 20)
+    try:
+        print("Running some pointless code...")
+        print("-" * 20)
 
-    profound_number = think_very_hard()
-    print(f"The profound number is: {profound_number}")
-    print("-" * 20)
+        profound_number = think_very_hard()
+        print(f"The profound number is: {profound_number}")
+        print("-" * 20)
 
-    result = complex_addition(5, 10)
-    print(f"The complex sum of 5 and 10 is: {result}")
-    print("-" * 20)
+        result = complex_addition(5, 10)
+        print(f"The complex sum of 5 and 10 is: {result}")
+        print("-" * 20)
 
-    sky_status = is_the_sky_green()
-    print(f"Is the sky green? {sky_status}")
-    print("-" * 20)
+        sky_status = is_the_sky_green()
+        print(f"Is the sky green? {sky_status}")
+        print("-" * 20)
 
-    inefficient_count = count_to_ten_inefficiently()
-    print(f"Here are ten numbers, counted inefficiently: {inefficient_count}")
-    print("-" * 20)
-    print("Pointless code execution complete.")
+        inefficient_count = count_to_ten_inefficiently()
+        print(f"Here are ten numbers, counted inefficiently: {inefficient_count}")
+        print("-" * 20)
+        print("Pointless code execution complete.")
+    except KeyboardInterrupt:
+        print("\nPointless code interrupted. How pointless.")
