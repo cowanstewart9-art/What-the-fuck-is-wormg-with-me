@@ -1,5 +1,6 @@
 package com.example.placeholder;
 
+import android.app.AppOpsManager;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -9,12 +10,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-    public static long lastInteractionTime = 0;
+    public static volatile long lastInteractionTime = 0;
     private static final String CHANNEL_ID = "monitor_channel";
 
     @Override
@@ -24,6 +26,7 @@ public class MainActivity extends Activity {
 
         createNotificationChannel();
         requestNotificationPermission();
+        checkUsageStatsPermission();
 
         Intent serviceIntent = new Intent(this, BackgroundMonitorService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -37,6 +40,19 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 33) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+    }
+
+    private void checkUsageStatsPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), getPackageName());
+
+            if (mode != AppOpsManager.MODE_ALLOWED) {
+                Toast.makeText(this, "Please grant usage access to monitor apps", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
             }
         }
     }

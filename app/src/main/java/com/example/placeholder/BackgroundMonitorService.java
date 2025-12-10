@@ -4,40 +4,51 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.app.ActivityManager;
+import android.util.Log;
 import java.util.List;
 
 public class BackgroundMonitorService extends Service {
 
     private static final String CHANNEL_ID = "monitor_channel";
     private static final int NOTIFICATION_ID = 1;
-    private Handler handler;
+    private Handler serviceHandler;
+    private HandlerThread handlerThread;
     private Runnable runnable;
     private static final long CHECK_INTERVAL = 5000; // 5 seconds
     private static final long IDLE_THRESHOLD = 30000; // 30 seconds
     private boolean isIdleNotificationSent = false;
+    private boolean isPermissionNotificationSent = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
         startForeground(NOTIFICATION_ID, createNotification("Monitoring", "Background monitor is running"));
-        handler = new Handler(Looper.getMainLooper());
+
+        // Use a background thread for monitoring tasks
+        handlerThread = new HandlerThread("BackgroundMonitorThread");
+        handlerThread.start();
+        serviceHandler = new Handler(handlerThread.getLooper());
+
         runnable = new Runnable() {
             @Override
             public void run() {
                 checkIdleStatus();
-                checkBackgroundProcesses();
-                handler.postDelayed(this, CHECK_INTERVAL);
+                monitorRunningApps();
+                serviceHandler.postDelayed(this, CHECK_INTERVAL);
             }
         };
-        handler.post(runnable);
+        serviceHandler.post(runnable);
     }
 
     private void checkIdleStatus() {
@@ -52,19 +63,47 @@ public class BackgroundMonitorService extends Service {
         }
     }
 
-    private void checkBackgroundProcesses() {
-        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        if (am != null) {
-            // NOTE: On Android 5.1+, this returns only the current app process.
-            // This logic is a placeholder for demonstration or system-level apps.
-            List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
-            if (processes != null) {
-                for (ActivityManager.RunningAppProcessInfo process : processes) {
-                    if (process.processName.contains("malicious") || process.processName.contains("spyware")) {
-                        sendNotification("Security Alert", "Suspicious process detected: " + process.processName);
+    private void monitorRunningApps() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            UsageStatsManager usm = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+            long time = System.currentTimeMillis();
+            List<UsageStats> stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 10, time);
+
+            if (stats == null || stats.isEmpty()) {
+                if (!isPermissionNotificationSent) {
+                     Log.w("BackgroundMonitor", "No usage stats accessible. Permission might be missing.");
+                }
+                checkBackgroundProcessesLegacy();
+            } else {
+                isPermissionNotificationSent = true;
+                Log.d("BackgroundMonitor", "Monitoring " + stats.size() + " active apps.");
+                for (UsageStats usage : stats) {
+                    if (usage.getLastTimeUsed() > time - 5000) {
+                        Log.d("BackgroundMonitor", "Active App: " + usage.getPackageName());
+                        checkSuspiciousPackage(usage.getPackageName());
                     }
                 }
             }
+        } else {
+            checkBackgroundProcessesLegacy();
+        }
+    }
+
+    private void checkBackgroundProcessesLegacy() {
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
+            if (processes != null) {
+                for (ActivityManager.RunningAppProcessInfo process : processes) {
+                    checkSuspiciousPackage(process.processName);
+                }
+            }
+        }
+    }
+
+    private void checkSuspiciousPackage(String packageName) {
+         if (packageName.contains("malicious") || packageName.contains("spyware")) {
+            sendNotification("Security Alert", "Suspicious process detected: " + packageName);
         }
     }
 
@@ -108,6 +147,7 @@ public class BackgroundMonitorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(runnable);
+        serviceHandler.removeCallbacks(runnable);
+        handlerThread.quitSafely();
     }
 }
