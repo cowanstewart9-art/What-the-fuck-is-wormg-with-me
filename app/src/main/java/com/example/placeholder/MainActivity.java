@@ -12,6 +12,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.MotionEvent;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -22,6 +25,20 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Simple UI
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setGravity(Gravity.CENTER);
+
+        TextView statusView = new TextView(this);
+        statusView.setText("Security Monitor Active\n\n- Overlay Detection: ON\n- Background Monitor: ON");
+        statusView.setGravity(Gravity.CENTER);
+        statusView.setTextSize(20);
+
+        layout.addView(statusView);
+        setContentView(layout);
+
         lastInteractionTime = System.currentTimeMillis();
 
         createNotificationChannel();
