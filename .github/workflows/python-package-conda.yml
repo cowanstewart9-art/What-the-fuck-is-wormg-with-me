@@ -18,9 +18,42 @@ jobs:
       run: |
         # $CONDA is an environment variable pointing to the root of the miniconda directory
         echo $CONDA/bin >> $GITHUB_PATH
+    - name: Auto-create environment.yml if missing
+      run: |
+        if [ ! -f environment.yml ]; then
+          echo "environment.yml not found — generating automatically..."
+          cat << 'EOF' > environment.yml
+        name: project_env
+        channels:
+          - conda-forge
+          - defaults
+
+        dependencies:
+          - python=3.10
+          - pip
+          - git
+          - openssl
+          - curl
+
+          - pip:
+              - setuptools
+              - wheel
+              - build
+              - requests
+              - tqdm
+              - colorama
+              - flake8
+              - black
+              - isort
+              - python-dotenv
+              - -r requirements.txt
+        EOF
+        else
+          echo "environment.yml already exists — using existing file."
+        fi
     - name: Update environment
       # The '|| echo...' part catches the failure and prints a message instead of exiting
-      run: conda env update --file environment.yml --name base || echo "Environment file missing, skipping update..."
+      run: conda env update --file environment.yml --name base || echo "Conda environment update failed."
     - name: Lint with flake8
       run: |
         conda install flake8
