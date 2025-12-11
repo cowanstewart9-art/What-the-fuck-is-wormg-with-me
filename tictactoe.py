@@ -71,36 +71,39 @@ class TicTacToe:
 def main():
     game = TicTacToe()
     player = 'X'
-    while True:
-        game.print_board()
-        if player == 'X':
-            try:
-                move = int(input('Enter your move (0-8): '))
-                if 0 <= move <= 8 and game.make_move(move, player):
-                    if game.is_winner(player):
-                        game.print_board()
-                        print(f'{player} wins!')
-                        break
-                    if game.is_draw():
-                        game.print_board()
-                        print('It\'s a draw!')
-                        break
-                    player = 'O'
-                else:
-                    print('Invalid move. Try again.')
-            except ValueError:
-                print('Invalid input. Please enter a number.')
-        else:
-            game.ai_move()
-            if game.is_winner('O'):
-                game.print_board()
-                print('AI wins!')
-                break
-            if game.is_draw():
-                game.print_board()
-                print('It\'s a draw!')
-                break
-            player = 'X'
+    try:
+        while True:
+            game.print_board()
+            if player == 'X':
+                try:
+                    move = int(input('Enter your move (0-8): '))
+                    if 0 <= move <= 8 and game.make_move(move, player):
+                        if game.is_winner(player):
+                            game.print_board()
+                            print(f'{player} wins!')
+                            break
+                        if game.is_draw():
+                            game.print_board()
+                            print('It\'s a draw!')
+                            break
+                        player = 'O'
+                    else:
+                        print('Invalid move. Try again.')
+                except ValueError:
+                    print('Invalid input. Please enter a number.')
+            else:
+                game.ai_move()
+                if game.is_winner('O'):
+                    game.print_board()
+                    print('AI wins!')
+                    break
+                if game.is_draw():
+                    game.print_board()
+                    print('It\'s a draw!')
+                    break
+                player = 'X'
+    except (KeyboardInterrupt, EOFError):
+        print("\nExiting game...")
 
 if __name__ == '__main__':
     main()
