@@ -12,6 +12,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.TrafficStats;
 import android.os.Build;
+import android.content.pm.ServiceInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -33,7 +34,11 @@ public class BackgroundMonitorService extends Service {
         handler = new Handler(Looper.getMainLooper());
         SecurityLog.log("Service: Security Monitor Starting...");
 
-        startForeground(1, createNotification());
+        if (Build.VERSION.SDK_INT >= 34) {
+            startForeground(1, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+        } else {
+            startForeground(1, createNotification());
+        }
 
         setupNetworkMonitoring();
         startTrafficMonitoring();
