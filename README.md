@@ -1,34 +1,45 @@
-# Jules Security Monitor
+# Jules Security Monitor & Tools
 
-A robust Android Security Application designed to monitor network traffic, detect anomalies, and prevent overlay attacks.
+A comprehensive security suite containing an Android Traffic Monitor and Python-based utilities for safe environment testing.
 
-## Features
+## Android Application
 
-### 🛡️ Overlay Detection (Anti-Tapjacking)
-- Detects if a malicious app is drawing an overlay on top of the security monitor.
-- Blocks touch inputs when an overlay is detected (`FLAG_WINDOW_IS_OBSCURED`).
-- Logs the attempt in the security log.
+### Features
+*   **🛡️ Overlay Detection (Anti-Tapjacking):** Detects and blocks inputs when an overlay is obscuring the screen.
+*   **📶 Network Traffic Monitoring:** Real-time background tracking of upload/download rates and network changes (WiFi/Mobile/VPN).
+*   **🤖 Heuristic AI:** Analyzes traffic patterns to detect anomalies like rapid switching or massive data spikes.
+*   **Run on Boot:** Automatically restarts monitoring after device reboot.
 
-### 📶 Network Traffic Monitoring
-- **Real-time Monitoring**: Tracks background data usage (Upload/Download).
-- **Connectivity Analysis**: Monitors network type changes (WiFi/Mobile/VPN).
-- **Heuristic AI**: Detects suspicious patterns like rapid network switching or unusual data spikes.
-- **Foregound Service**: Runs continuously in the background with a persistent notification.
+### Installation
+1.  Download `JulesSecurity.apk` from the **GitHub Releases** page.
+2.  Install on your Android device (Android 5.0+, optimized for Android 14).
 
-### 📝 Security Logging
-- Thread-safe in-memory logging.
-- Live programmatic UI display of security events.
+## Python Utilities
 
-## Build & Installation
+The repository includes standalone Python tools located in `python_scripts/`.
 
-### Android 14 Ready
-This app is fully compliant with Android 14 (API 34) Foreground Service requirements, utilizing the `specialUse` service type.
+### Tic-Tac-Toe (AI)
+A command-line game with a Minimax-based AI, suitable for testing terminal capabilities (e.g., in Termux).
 
-### Local Build
+**Run on Termux:**
+```bash
+./termux_run.sh
+```
+
+**Run Locally:**
+```bash
+python3 python_scripts/tictactoe.py
+```
+
+## Development
+
+### Android Build
 ```bash
 ./gradlew assembleDebug
 ```
-The APK will be located at `app/build/outputs/apk/debug/app-debug.apk`.
+*Note: Requires JDK 17 and Android SDK.*
 
-### CI/CD
-This repository is configured with GitHub Actions. Every push to the `restore-security-app` branch triggers a build that generates the APK artifact.
+### Project Structure
+*   `app/`: Android Studio project files.
+*   `python_scripts/`: Python tools and tests.
+*   `.github/workflows/`: CI/CD pipelines for automatic building and releasing.

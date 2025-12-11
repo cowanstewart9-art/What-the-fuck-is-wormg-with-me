@@ -1,4 +1,10 @@
 import unittest
+import sys
+import os
+
+# Ensure the script can import from the same directory
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from tictactoe import TicTacToe
 
 class TestTicTacToe(unittest.TestCase):
