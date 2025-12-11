@@ -11,8 +11,18 @@ A comprehensive security suite containing an Android Traffic Monitor and Python-
 *   **Run on Boot:** Automatically restarts monitoring after device reboot.
 
 ### Installation
-1.  Download `JulesSecurity.apk` from the **GitHub Releases** page.
-2.  Install on your Android device (Android 5.0+, optimized for Android 14).
+
+#### Option 1: Direct Download
+1.  Go to the **[GitHub Releases Page](../../releases/latest)**.
+2.  Download `JulesSecurity.apk`.
+3.  Tap the file to install.
+
+#### Option 2: Install via Termux
+If you have the repository cloned in Termux, you can auto-download and install the app:
+```bash
+./install_via_termux.sh
+```
+*Note: This will download the latest APK release and prompt the system installer.*
 
 ## Python Utilities
 
