@@ -1,0 +1,8 @@
+// In your root build.gradle file
+
+allprojects {
+    repositories {
+        google()  // <--- This is required for com.android.tools dependencies
+        mavenCentral()
+    }
+}
