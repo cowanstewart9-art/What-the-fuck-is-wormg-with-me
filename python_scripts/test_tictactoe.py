@@ -1,4 +1,10 @@
 import unittest
+import sys
+import os
+
+# Add the directory containing the module to the path so it can be imported
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from tictactoe import TicTacToe
 
 class TestTicTacToe(unittest.TestCase):
