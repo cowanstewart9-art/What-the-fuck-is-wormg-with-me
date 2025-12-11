@@ -5,6 +5,10 @@ on:
     branches: [ "main", "restore-security-app" ]
   pull_request:
     branches: [ "main", "restore-security-app" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -27,8 +31,24 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleDebug
 
+    - name: Rename APK
+      run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/JulesSecurity.apk
+
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
-        name: app-debug.apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: JulesSecurity.apk
+        path: app/build/outputs/apk/debug/JulesSecurity.apk
+
+    - name: Release APK
+      if: github.ref == 'refs/heads/restore-security-app' || github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: latest
+        files: app/build/outputs/apk/debug/JulesSecurity.apk
+        name: Latest Build
+        body: "Automated build from the latest changes."
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
